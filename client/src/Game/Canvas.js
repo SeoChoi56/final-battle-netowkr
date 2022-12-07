@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, } from 'react'
+import React, { useRef, useEffect, useState, } from 'react'
 import Enemy1 from './Enemy1';
 import PlayerClass from './PlayerClass';
 import Projectile from './Projectile';
 import ParticleExplosion from './ParticleExplosion';
 import "../Fonts/RetroGaming.ttf"
 
-export default function Canvas() {
+export default function Canvas({savePlayer, saveLevelNum, saveEnemiesList}) {
 
     const rows = 4
     const columns = 8
@@ -13,11 +13,16 @@ export default function Canvas() {
 
     let game = {
         over: false,
-        active: true
+        active: true,
+        restart: false
     }
 
+    //Initial level number
+    let levelNum = saveLevelNum
+    const [showLevel, setLevel] = useState(levelNum)
+
     //create player
-    const player = new PlayerClass()
+    const player = savePlayer
 
     //projectiles array
     const projectiles = []
@@ -28,11 +33,11 @@ export default function Canvas() {
     //x: random number (3-5) * tile-size
     //y: random number (0-2) * tile-sze
     //tile size = 128
-    const enemiesList = []
+    const enemiesList = saveEnemiesList
 
     //number of enemies will be random but in between 1 - 3
     function randomNumEnemies() {
-        const rand = Math.floor(Math.random() * 3) + 1
+        const rand = Math.floor(Math.random() * (1 + levelNum)) + 1
         for (let i = 0; i < rand; i++) {
             //create a random number (3-5) for x position
             const randXPos = (Math.floor(Math.random() * 4) + 4) * 128
@@ -41,7 +46,7 @@ export default function Canvas() {
                 x: randXPos,
                 y: randYPos
             }
-            enemiesList.push(new Enemy1(randPos))
+            enemiesList.push(new Enemy1(randPos, levelNum))
         }
     }
 
@@ -52,10 +57,6 @@ export default function Canvas() {
     //particles Array
     const particles = []
 
-    //Initial level number
-    //Flag for end level
-    let levelNum = 1
-    let endLevel = false
 
 
     //Canvas ref
@@ -131,11 +132,8 @@ export default function Canvas() {
                 // setTimeout(() => {
                 //     game.active = false
                 // }, 50)
-                // levelNum++
-
-                //deactivate current animation loop
-                window.cancelAnimationGram(animationID)
-
+                levelNum++
+                setLevel(levelNum)
             }
 
             //clear canvas to redraw animation
@@ -157,6 +155,8 @@ export default function Canvas() {
 
             //Draws the enemies in enemy ist
             enemiesList.forEach((enemy, index) => {
+
+                //redraws the enemy 
                 enemy.update(ctx, enemy1ProjectileList)
 
                 //player projectiles hitting enemy
@@ -228,6 +228,8 @@ export default function Canvas() {
                 }
             })
         }
+
+        //Handles player movement
         document.addEventListener('keydown', ({ key }) => {
             if (game.over) return
             switch (key) {
@@ -253,7 +255,8 @@ export default function Canvas() {
                             x: player.position.x + 102,
                             y: player.position.y + 64
                         },
-                        velocity: 10
+                        velocity: 7,
+                        levelNum: levelNum
                     }))
                     break;
             }
@@ -261,11 +264,16 @@ export default function Canvas() {
 
         // Start Game
         document.getElementById('startButton').addEventListener('click', () => {
-            console.log(document.getElementById('startScreen').style.display = "none")
+            document.getElementById('startScreen').style.display = "none"
+            document.getElementById('gameCanvas').style.display = ''
             animate()
         })
 
-
+        document.getElementById('restart').addEventListener('click', () => {
+            
+            animate()
+            console.log(levelNum)
+        })
 
     })
 
@@ -337,20 +345,14 @@ export default function Canvas() {
 
     }
 
-    function winRound(ctx) {
-        setTimeout(() => {
-            game.active = false
-        }, 50)
-        levelNum++
-    }
+
 
 
 
     return (
         <div>
             <div style={{
-                display: "inline-block",
-                position: "relative"
+                position: "relative",
             }}>
                 <div style={{
                     backgroundColor: "red",
@@ -360,24 +362,38 @@ export default function Canvas() {
                     right: 0,
                     bottom: 0,
                     pointerEvents: "none",
-                    display: "none"
-                }}></div>
-                <canvas id="gameCanvas" ref={canvasRef} height="512px" width="1024px" />
-                <div id="startScreen" style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundImage: `url("/Menu/start.png")`,
-                    zIndex: 100,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-
-                }}>
+                    display: "none",
+                }}
+                    height="512px"
+                    width="1024px"
+                ></div>
+                <canvas id="gameCanvas"
+                    ref={canvasRef}
+                    style={{
+                        display: 'none'
+                    }}
+                    height="512px"
+                    width="1024px" />
+                <h1 id="show-level">Level: {showLevel}</h1>
+                <button id="restart">Restart</button>
+                <div id="startScreen"
+                    style={{
+                        position: "absolute",
+                        backgroundImage: `url("/Menu/start.png")`,
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 100,
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: '100%',
+                        height: "1286px",
+                        aspectRatio: 1,
+                    }}>
                     <div id="startButton">
                         <img src="/Menu/startbutton.png" width={80} />
                     </div>

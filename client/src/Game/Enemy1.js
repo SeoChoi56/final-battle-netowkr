@@ -1,7 +1,7 @@
 import Enemy1Projectile from './Enemy1Projectile'
 
 class Enemy1 {
-    constructor(newposition) {
+    constructor(newposition, levelNum ) {
         const image = new Image()
         image.src = "/EnemyModel/mettaur-sprite-map.png"
 
@@ -17,6 +17,7 @@ class Enemy1 {
             this.HP = 20
             //this is the hitbox
             this.radius = 31
+            this.levelNum = levelNum
         }
     }
 
@@ -31,11 +32,13 @@ class Enemy1 {
         if (this.image) {
             this.draw(ctx)
             this.frameCount++
-            if (this.frameCount === 20) {
+            if (this.frameCount === 40) {
+                const chanceToFire = Math.floor(Math.random() * 100) + 1
+                if(chanceToFire > 60)
                 this.shoot(enemy1ProjectileList)
             }
             //every 5 frames/update calls
-            if (this.frameCount === 30) {
+            if (this.frameCount === 60) {
                 //checks for direction
                 if (this.directionUp) {
                     //if position is at top change direction
@@ -64,7 +67,7 @@ class Enemy1 {
                 y: this.position.y + 64
             },
             velocity: {
-                x: -10,
+                x: -2,
                 y: 0
             }
         }))

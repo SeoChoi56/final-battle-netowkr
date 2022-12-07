@@ -1,12 +1,12 @@
 class Projectile {
-    constructor({position , velocity}) {
+    constructor({position , velocity, levelNum}) {
         this.position = {
             x: position.x,
             y: position.y
         }
         this.velocity = velocity
-        this.radius = 5
-        this.damage = 1
+        this.radius = 7
+        this.damage = levelNum
     }
 
     draw(ctx) {

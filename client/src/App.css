@@ -33,4 +33,13 @@
   z-index: 1;
 }
 
+#nav-bar {
+  display:block;
+}
+
+.nav-bar-link {
+  font-size: x-large;
+  border: solid;
+}
+
 
