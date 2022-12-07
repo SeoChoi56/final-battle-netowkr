@@ -11,7 +11,7 @@ class Enemy1Projectile {
     }
 
     draw(ctx) {
-        ctx.fillStyle = "white"
+        ctx.fillStyle="white"
         ctx.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
@@ -20,3 +20,5 @@ class Enemy1Projectile {
         this.position.x += this.velocity.x
     }
 }
+
+export default Enemy1Projectile
